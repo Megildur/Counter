@@ -166,4 +166,13 @@ cython_debug/
 *.nix
 
 # Ignore Replit configuration files
-.replit
+.replit# First, ensure you've added the correct patterns to .gitignore
+
+# Remove all newly ignored files from Git's tracking
+git rm -r --cached .
+
+# Add the changes in the index (which will now respect the .gitignore)
+git add .
+
+# Commit the changes
+git commit -m "Remove ignored files from tracking"
