@@ -31,7 +31,7 @@ class SyncCog(commands.Cog):
 
     @app_commands.command(name='help', description='Show help for slash commands')
     async def help(self, ctx):
-        embed = discord.Embed(title='Help', description='**List of available slash commands:**')
+        embed = discord.Embed(title='Help', description='**List of available slash commands:**', color=discord.Color.from_str('#af2202'))
         embed.add_field(name='**General commands:**', value='', inline=False)
         for command in self.bot.tree.walk_commands(type=discord.AppCommandType.chat_input, ):
             if command.parent is None and not isinstance(command, discord.app_commands.Group):

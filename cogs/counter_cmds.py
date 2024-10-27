@@ -16,8 +16,6 @@ class Counter_Cmds(commands.Cog):
     server = app_commands.Group(name='server', description='Commands to enable or disable the recording of the word count for the entire server.', parent=count)
 
     words = app_commands.Group(name='words', description='Commands to view the current word count stats of the server.')
-    
-    user = app_commands.Group(name='user', description='Commands to view the current word count stats of the user.', parent=words)
 
     @server.command(name='set', description='Enable/disable the recording of the word count of every channel in the server')
     @app_commands.describe(
@@ -102,43 +100,6 @@ class Counter_Cmds(commands.Cog):
                 if channel.id and 1 not in [row[0] for row in result]:
                     embed = discord.Embed(title='Error', description='Word count is not being recorded in this channel', color=discord.Color.red())
                     await interaction.response.send_message(embed=embed, ephemeral=True)
-
-    @user.command(name='count', description='Shows the word count of a user')
-    @app_commands.describe(user='The user to show the word count of', channel='The channel to show the word count of user in')
-    async def user_count(self, interaction, user: discord.Member, channel: Optional[discord.TextChannel] = None, make_private: Literal['Yes'] = None) -> None:
-        if user.bot:
-            embed = discord.Embed(title='Error', description='Bots do not have a word count', color=discord.Color.red())
-            await interaction.response.send_message(embed=embed, ephemeral=True)
-            return
-        async with aiosqlite.connect('channels.db') as db:
-            async with db.execute('SELECT channel_id FROM channels WHERE guild_id = ?', (interaction.guild_id,)) as cursor:
-                result = await cursor.fetchall()
-                if not result:
-                    embed = discord.Embed(title='Error', description='Word count is not enabled on this server', color=discord.Color.red())
-                    await interaction.response.send_message(embed=embed, ephemeral=True)
-                    return
-        if channel is None:
-            async with aiosqlite.connect('server.db') as db:
-                async with db.execute('SELECT count FROM server WHERE guild_id = ? AND user_id = ?', (interaction.guild_id, user.id)) as cursor:
-                    result = await cursor.fetchone()
-                    if result is None:
-                        embed = discord.Embed(title='Error', description=f'The word count of {user.mention} in {interaction.guild.name} is 0', color=discord.Color.red())
-                        await interaction.response.send_message(embed=embed, ephemeral=True)
-                        return
-                    embed = discord.Embed(title=f'{user.display_name}\'s word count', description=f'{user.mention} has said {result[0]} words in {interaction.guild.name}', color=discord.Color.from_str('#af2202'))    
-        else:
-            async with aiosqlite.connect('counter.db') as db:
-                async with db.execute('SELECT count FROM counters WHERE guild_id = ? AND user_id = ? AND channel_id = ?', (interaction.guild_id, user.id, channel.id)) as cursor:
-                    result = await cursor.fetchone()
-                    if result is None:
-                        embed = discord.Embed(title='Error', description=f'The word count of {user.mention} in {channel.mention} is 0', color=discord.Color.red())
-                        await interaction.response.send_message(embed=embed, ephemeral=True)
-                        return
-                    embed = discord.Embed(title=f'{user.display_name}\'s word count', description=f'{user.mention} has said {result[0]} words in {channel.mention}', color=discord.Color.from_str('#af2202'))
-        if make_private == 'Yes':
-            await interaction.response.send_message(embed=embed, ephemeral=True)
-        else: 
-            await interaction.response.send_message(embed=embed)
 
     @words.command(name='leaderboard', description='Shows the word count leaderboard of the server')
     @app_commands.describe(channel='The channel to show the leaderboard of members in')

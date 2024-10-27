@@ -229,7 +229,7 @@ class Keyword(commands.Cog):
                 async with db.execute('SELECT keyword, count, user_id FROM keyword_channel WHERE guild_id = ?', (interaction.guild_id,)) as cursor:
                     result = await cursor.fetchall()
             if result:
-                embed = discord.Embed(title='Keyword Leaderboard', color=discord.Color.green(), description='The keyword leaderboard for this server')
+                embed = discord.Embed(title='Keyword Leaderboard', color=discord.Color.from_str('#af2202'), description='The keyword leaderboard for this server')
                 grouped_results = itertools.groupby(sorted(result, key=lambda x: x[0]), lambda x: x[0])
                 for keyword, group in grouped_results:
                     users = sorted([(user_id, count) for _, count, user_id in group], key=lambda x: x[1], reverse=True)
@@ -245,7 +245,7 @@ class Keyword(commands.Cog):
             async with db.execute('SELECT keyword FROM keyword WHERE guild_id = ?', (interaction.guild_id,)) as cursor:
                 result = await cursor.fetchall()
         if result:
-            embed = discord.Embed(title='Keywords', color=discord.Color.green(), description='The keywords in this server')
+            embed = discord.Embed(title='Keywords', color=discord.Color.from_str('#af2202'), description='The keywords in this server')
             for row in result:
                 embed.add_field(name=row[0], value='\u200b', inline=False)
             await interaction.response.send_message(embed=embed)

@@ -82,7 +82,7 @@ class Messages(commands.Cog):
                         embed = discord.Embed(title='Message Leaderboard', description='No messages have been sent yet!', color=discord.Color.red())
                         await interaction.response.send_message(embed=embed)
                         return
-                    embed = discord.Embed(title='Message Leaderboard', color=discord.Color.green())
+                    embed = discord.Embed(title='Message Leaderboard', color=discord.Color.from_str('#af2202'))
                     for i, row in enumerate(rows):
                         user = interaction.guild.get_member(row[0])
                         if user is None:
@@ -97,7 +97,7 @@ class Messages(commands.Cog):
                         embed = discord.Embed(title='Message Leaderboard', description='No messages have been sent yet!', color=discord.Color.red())
                         await interaction.response.send_message(embed=embed)
                         return
-                    embed = discord.Embed(title='Message Leaderboard', color=discord.Color.green())
+                    embed = discord.Embed(title='Message Leaderboard', color=discord.Color.from_str('#af2202'))
                     for i, row in enumerate(rows):
                         user = interaction.guild.get_member(row[0])
                         if user is None:

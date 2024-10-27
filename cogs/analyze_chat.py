@@ -41,7 +41,7 @@ class AnalyzeChat(commands.Cog):
                 await status_message.edit(content=update)
 
             # Create an embed with the analysis results
-            embed = discord.Embed(title="Chat Analysis Results", color=discord.Color.blue())
+            embed = discord.Embed(title="Chat Analysis Results", color=discord.Color.from_str('#af2202'))
 
             # Split the result into sections
             sections = result.split('\n\n')

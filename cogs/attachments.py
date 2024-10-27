@@ -135,7 +135,7 @@ class Attachments(commands.Cog):
                                 embed.add_field(name=f'{index}. {user.display_name}', value=f'{count} attachments', inline=False)
                         await interaction.response.send_message(embed=embed)
                     else:
-                        embed = discord.Embed(title='Attachment Leaderboard', description='No users found.', color=discord.Color.blue())
+                        embed = discord.Embed(title='Attachment Leaderboard', description='No users found.', color=discord.Color.from_str('#af2202'))
                         await interaction.response.send_message(embed=embed, ephemeral=True)
         else:
             async with aiosqlite.connect('attachments_channels.db') as db:
@@ -149,7 +149,7 @@ class Attachments(commands.Cog):
                                 embed.add_field(name=f'{index}. {user.display_name}', value=f'{count} attachments', inline=False)
                         await interaction.response.send_message(embed=embed)
                     else:
-                        embed = discord.Embed(title='Attachment Leaderboard', description='No users found.', color=discord.Color.blue())
+                        embed = discord.Embed(title='Attachment Leaderboard', description='No users found.', color=discord.Color.from_str('#af2202'))
                         await interaction.response.send_message(embed=embed, ephemeral=True)
         
 async def setup(bot) -> None:
