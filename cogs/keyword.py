@@ -8,7 +8,6 @@ import itertools
 class Keyword(commands.Cog):
     def __init__(self, bot) -> None:
         self.bot = bot
-        print('Keyword cog loaded')
 
     async def cog_load(self) -> None:
         async with aiosqlite.connect('keyword.db') as db:
@@ -42,23 +41,8 @@ class Keyword(commands.Cog):
               )'''
           )
           await db.commit()
-
-    @commands.Cog.listener()
-    async def on_message(self, message) -> None:
-        if message.author.bot:
-            return
-        async with aiosqlite.connect('ignore.db') as db:
-            async with db.execute('SELECT channel_id FROM ignore WHERE guild_id = ?', (message.guild.id,)) as cursor:
-                iresult = await cursor.fetchall()
-                for channel in iresult:
-                    if message.channel.id in channel:
-                        return
-        async with aiosqlite.connect('channels.db') as db:
-            async with db.execute('SELECT channel_id FROM channels WHERE guild_id = ?', (message.guild.id,)) as cursor:
-                result = await cursor.fetchall()
-        if not result:
-            return
-        else:
+            
+    async def keyword_message(self, message, result) -> None:
             async with aiosqlite.connect('keyword.db') as db:
                 async with db.execute('SELECT keyword FROM keyword WHERE guild_id = ?', (message.guild.id,)) as cursor:
                     kresult = await cursor.fetchall()
@@ -78,25 +62,10 @@ class Keyword(commands.Cog):
                             if word_count > 0:
                                 await self.update_kw(row[0], word_count, message.guild.id, message.channel.parent_id, message.author.id)
 
-    @commands.Cog.listener()
-    async def on_message_delete(self, message) -> None:
-        if message.author.bot:
-            return
-        async with aiosqlite.connect('ignore.db') as db:
-            async with db.execute('SELECT channel_id FROM ignore WHERE guild_id = ?', (message.guild.id,)) as cursor:
-                iresult = await cursor.fetchall()
-                for channel in iresult:
-                    if message.channel.id in channel:
-                        return
-        async with aiosqlite.connect('channels.db') as db:
-            async with db.execute('SELECT channel_id FROM channels WHERE guild_id = ?', (message.guild.id,)) as cursor:
-                result = await cursor.fetchall()
-        if not result:
-            return
-        else:
-            async with aiosqlite.connect('keyword.db') as db:
-                async with db.execute('SELECT keyword FROM keyword WHERE guild_id = ?', (message.guild.id,)) as cursor:
-                    kresult = await cursor.fetchall()
+    async def keyword_delete(self, message, result) -> None:
+        async with aiosqlite.connect('keyword.db') as db:
+            async with db.execute('SELECT keyword FROM keyword WHERE guild_id = ?', (message.guild.id,)) as cursor:
+                kresult = await cursor.fetchall()
             for channel_id in result:
                 if message.channel.type != discord.ChannelType.public_thread:
                     if 1 in channel_id or message.channel.id in channel_id:
@@ -113,25 +82,10 @@ class Keyword(commands.Cog):
                             if word_count > 0:
                                 await self.remove_kw(row[0], word_count, message.guild.id, message.channel.parent_id, message.author.id)
 
-    @commands.Cog.listener()
-    async def on_message_edit(self, before, after) -> None:
-        if before.author.bot:
-            return
-        async with aiosqlite.connect('ignore.db') as db:
-            async with db.execute('SELECT channel_id FROM ignore WHERE guild_id = ?', (before.guild.id,)) as cursor:
-                iresult = await cursor.fetchall()
-                for channel in iresult:
-                    if before.channel.id in channel:
-                        return
-        async with aiosqlite.connect('channels.db') as db:
-            async with db.execute('SELECT channel_id FROM channels WHERE guild_id = ?', (before.guild.id,)) as cursor:
-                result = await cursor.fetchall()
-        if not result:
-            return
-        else:
-            async with aiosqlite.connect('keyword.db') as db:
-                async with db.execute('SELECT keyword FROM keyword WHERE guild_id = ?', (before.guild.id,)) as cursor:
-                    kresult = await cursor.fetchall()
+    async def keyword_edit(self, before, after, result) -> None:
+        async with aiosqlite.connect('keyword.db') as db:
+            async with db.execute('SELECT keyword FROM keyword WHERE guild_id = ?', (before.guild.id,)) as cursor:
+                kresult = await cursor.fetchall()
             for channel_id in result:
                 if before.channel.type != discord.ChannelType.public_thread:
                     if 1 in channel_id or before.channel.id in channel_id:
@@ -221,6 +175,12 @@ class Keyword(commands.Cog):
                             await db.commit()
                             embed = discord.Embed(title='Success', description=f'The keyword {keyword} has been added to the server', color=discord.Color.green())
                             await interaction.response.send_message(embed=embed, ephemeral=True)
+                            return
+                else:
+                    await db.execute('INSERT INTO keyword (guild_id, keyword) VALUES (?, ?)', (interaction.guild_id, keyword))
+                    await db.commit()
+                    embed = discord.Embed(title='Success', description=f'The keyword {keyword} has been added to the server', color=discord.Color.green())
+                    await interaction.response.send_message(embed=embed, ephemeral=True)
 
     @keyword.command(name='remove', description='Remove a keyword from the server')
     @app_commands.describe(keyword='The keyword to remove')
@@ -295,3 +255,4 @@ class Keyword(commands.Cog):
 
 async def setup(bot) -> None:
     await bot.add_cog(Keyword(bot))
+    print('Keyword cog loaded')
