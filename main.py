@@ -10,10 +10,13 @@ from lxml import etree
 from collections import defaultdict
 from datetime import datetime
 from itertools import groupby
+import logging
 
 load_dotenv()
 
 intents = discord.Intents.all()
+
+handler = logging.FileHandler(filename='discord.log', encoding='utf-8', mode='w')
 
 class MyBot(commands.Bot):
     def __init__(self) -> None:
@@ -34,4 +37,4 @@ bot = MyBot()
 
 API_TOKEN = str(os.getenv('API_TOKEN'))
 
-bot.run(API_TOKEN)
+bot.run(API_TOKEN, , log_handler=handler, log_level=logging.ERROR)
