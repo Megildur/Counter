@@ -195,19 +195,27 @@ class Counter_Cmds(commands.Cog):
                             embed = discord.Embed(title='Error', description='No messages have been recorded in this server.', color=discord.Color.red())
                             await interaction.response.send_message(embed=embed, ephemeral=True)
                             return
-                        for row in result:
-                            await db.execute('UPDATE server SET count = ? WHERE guild_id = ? AND user_id = ?', (0, interaction.guild_id, row[0]))
-                            await db.commit()
+                        await db.execute('UPDATE server SET count = ? WHERE guild_id = ?', (0, interaction.guild_id))
+                        await db.commit()
                 async with aiosqlite.connect('counter.db') as db:
                     async with db.execute('SELECT user_id FROM counters WHERE guild_id = ?', (interaction.guild_id,)) as cursor:
                         result = await cursor.fetchall()  
-                        for row in result:
-                            await db.execute('UPDATE counters SET count = ? WHERE guild_id = ? AND user_id = ?', (0, interaction.guild_id, row[0]))
+                        if result:
+                            await db.execute('UPDATE counters SET count = ? WHERE guild_id = ?', (0, interaction.guild_id))
                             await db.commit()
                 embed = discord.Embed(title='Success', description='The word count of all users has been reset for the whole server!', color=discord.Color.green())
                 await interaction.response.send_message(embed=embed, ephemeral=True)
             else:
-                embed = discord.Embed(title='Error', description='You must specify a user to reset the word count of.', color=discord.Color.red())
+                async with aiosqlite.connect('counter.db') as db:
+                    async with db.execute('SELECT user_id FROM counters WHERE guild_id = ? AND channel_id = ?', (interaction.guild_id, channel.id)) as cursor:
+                        result = await cursor.fetchall()
+                        if not result:
+                            embed = discord.Embed(title='Error', description=f'No messages have been recorded in {channel.mention} for this server.', color=discord.Color.red())
+                            await interaction.response.send_message(embed=embed, ephemeral=True)
+                            return
+                        await db.execute('UPDATE counters SET count = ? WHERE guild_id = ? AND channel_id = ?', (0, interaction.guild_id, channel.id))
+                        await db.commit()
+                embed = discord.Embed(title='Success', description=f'The word count of all users has been reset for {channel.mention}!', color=discord.Color.green())
                 await interaction.response.send_message(embed=embed, ephemeral=True)
         else:
             if user.bot:
