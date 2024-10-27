@@ -39,19 +39,13 @@ class SyncCog(commands.Cog):
         embed.add_field(name='\u200b', value='', inline=False)
         embed.add_field(name='**Count settings commands:**', value='*(these comands require manage server permissions)*\n\u200b', inline=False)
         for command2 in self.bot.tree.walk_commands(type=discord.AppCommandType.chat_input, ):
-            if command2.root_parent is not None and command2.root_parent.name == 'count' and not isinstance(command2, discord.app_commands.Group):
+            if command2.root_parent is not None and command2.root_parent.name == 'count' and not isinstance(command2, discord.app_commands.Group) or command2.parent is not None and command2.parent.name == 'keyword' and not isinstance(command2, discord.app_commands.Group) and command2.name != 'leaderboard' or "count":
                 embed.add_field(name=f'/{command2.qualified_name}', value=command2.description, inline=False)
         embed.add_field(name='\u200b', value='', inline=False)
-        embed.add_field(name='**Words stats commands:**', value='*(these comands can be used by anyone to view user and server stats)*\n\u200b', inline=False)
+        embed.add_field(name='**Stats commands:**', value='*(these comands can be used by anyone to view user and server stats)*\n\u200b', inline=False)
         for command3 in self.bot.tree.walk_commands(type=discord.AppCommandType.chat_input, ):
-            if command3.root_parent is not None and command3.root_parent.name == 'words' and not isinstance(command3, discord.app_commands.Group):
+            if command3.root_parent is not None and command3.root_parent.name == 'words' and not isinstance(command3, discord.app_commands.Group) or command3.name == "leaderboard" or "count":
                 embed.add_field(name=f'/{command3.qualified_name}', value=command3.description, inline=False)
-        embed.add_field(name='\u200b', value='', inline=False)
-        embed.add_field(name='**Words stats commands:**', value='*(these comands can be used by anyone to view user and server stats)*\n\u200b', inline=False)
-        for command4 in self.bot.tree.walk_commands(type=discord.AppCommandType.chat_input, ):
-            if command4.root_parent is not None and command4.root_parent.name == 'keyword' and not isinstance(command4, discord.app_commands.Group):
-                embed.add_field(name=f'/{command4.qualified_name}', value=command4.description, inline=False)
-        embed.set_footer(text='*Made by @megildur272*')
         await ctx.response.send_message(embed=embed)
 
     @commands.Cog.listener()
