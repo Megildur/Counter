@@ -24,6 +24,7 @@ class MyBot(commands.Bot):
     
     async def setup_hook(self) -> None:
         await self.load_extension('sync')
+        await self.load_extension('ext')
         for filename in os.listdir('cogs'):
             if filename.endswith('.py'):
                 cog_name = filename[:-3]  # Remove the .py extension
@@ -37,4 +38,4 @@ bot = MyBot()
 
 API_TOKEN = str(os.getenv('API_TOKEN'))
 
-bot.run(API_TOKEN, , log_handler=handler, log_level=logging.ERROR)
+bot.run(API_TOKEN, log_handler=handler, log_level=logging.ERROR)
