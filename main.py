@@ -14,7 +14,6 @@ import logging
 import random
 import asyncio
 
-
 load_dotenv()
 
 intents = discord.Intents.all()
@@ -33,27 +32,7 @@ class MyBot(commands.Bot):
                 cog_name = filename[:-3]  # Remove the .py extension
                 await bot.load_extension(f'cogs.{cog_name}')
 
-    async def cycle(self):
-        while True:
-            Activity, Status = random.choice(presences)
-            await bot.change_presence(activity=Activity, status=Status)
-            print(f'Changed status to {Activity} {Status}')
-            await asyncio.sleep(3600)
-
-    async def on_ready(self) -> None:
-        print(f'Logged in as {self.user.name} (ID: {self.user.id})')
-        bot.loop.create_task(self.cycle())
-
 bot = MyBot()
-
-presences = [
-    (discord.Game(name="with words"), discord.Status.idle),
-    (discord.Activity(type=discord.ActivityType.listening, name="your commands"), discord.Status.do_not_disturb),
-    (discord.Activity(type=discord.ActivityType.watching, name="your messages"), discord.Status.online),
-    (discord.Activity(type=discord.ActivityType.listening, name=f"to {len(bot.guilds)} servers"), discord.Status.idle),
-    (discord.Activity(type=discord.ActivityType.listening, name="your messages"), discord.Status.do_not_disturb),
-    (discord.Activity(type=discord.ActivityType.watching, name=f"{len(bot.guilds)} servers"), discord.Status.online)
-]  
 
 API_TOKEN = str(os.getenv('API_TOKEN'))
 

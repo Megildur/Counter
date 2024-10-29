@@ -3,6 +3,8 @@ import discord
 from discord.app_commands.commands import guilds
 from discord.ext import commands
 from discord import app_commands
+import random
+import asyncio
 
 allowed_guilds = [1293647067998326936]
 
@@ -47,6 +49,26 @@ class SyncCog(commands.Cog):
             if command3.root_parent is not None and command3.root_parent.name == 'words' and not isinstance(command3, discord.app_commands.Group) or command3.name == "leaderboard" and command3.name != "reset":
                 embed.add_field(name=f'/{command3.qualified_name}', value=command3.description, inline=False)
         await ctx.response.send_message(embed=embed)
+
+    async def cycle(self):
+        while True:
+            presences = [
+    (discord.Game(name="with words"), discord.Status.idle),
+    (discord.Activity(type=discord.ActivityType.listening, name="your commands"), discord.Status.do_not_disturb),
+    (discord.Activity(type=discord.ActivityType.watching, name="your messages"), discord.Status.online),
+    (discord.Activity(type=discord.ActivityType.listening, name=f"to {len(self.bot.guilds)} servers"), discord.Status.idle),
+    (discord.Activity(type=discord.ActivityType.listening, name="your messages"), discord.Status.do_not_disturb),
+    (discord.Activity(type=discord.ActivityType.watching, name=f"{len(self.bot.guilds)} servers"), discord.Status.online)
+            ]
+            Activity, Status = random.choice(presences)
+            await self.bot.change_presence(activity=Activity, status=Status)
+            print(f'Changed status to {Activity} {Status}')
+            await asyncio.sleep(3600)
+            
+    @commands.Cog.listener()
+    async def on_ready(self) -> None:
+        print(f'Logged in as {self.bot.user.name} (ID: {self.bot.user.id})')
+        self.bot.loop.create_task(self.cycle())
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
