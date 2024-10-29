@@ -37,14 +37,14 @@ class SyncCog(commands.Cog):
             if command.parent is None and not isinstance(command, discord.app_commands.Group):
                  embed.add_field(name=f'/{command.name}', value=command.description, inline=False)
         embed.add_field(name='\u200b', value='', inline=False)
-        embed.add_field(name='**Count settings commands:**', value='*(these comands require manage server permissions)*\n\u200b', inline=False)
+        embed.add_field(name='**Count settings commands:**', value='*(these comands require manage server permissions except a couple exceptions)*\n\u200b', inline=False)
         for command2 in self.bot.tree.walk_commands(type=discord.AppCommandType.chat_input, ):
-            if command2.root_parent is not None and command2.root_parent.name == 'count' and not isinstance(command2, discord.app_commands.Group) or command2.parent is not None and command2.parent.name == 'keyword' and not isinstance(command2, discord.app_commands.Group) and command2.name != 'leaderboard' or "count":
+            if command2.root_parent is not None and command2.root_parent.name == 'count' and not isinstance(command2, discord.app_commands.Group) or command2.parent is not None and command2.root_parent.name == 'keyword' and not isinstance(command2, discord.app_commands.Group) and command2.name != 'leaderboard' or command2.name == "reset":
                 embed.add_field(name=f'/{command2.qualified_name}', value=command2.description, inline=False)
         embed.add_field(name='\u200b', value='', inline=False)
         embed.add_field(name='**Stats commands:**', value='*(these comands can be used by anyone to view user and server stats)*\n\u200b', inline=False)
         for command3 in self.bot.tree.walk_commands(type=discord.AppCommandType.chat_input, ):
-            if command3.root_parent is not None and command3.root_parent.name == 'words' and not isinstance(command3, discord.app_commands.Group) or command3.name == "leaderboard" or "count":
+            if command3.root_parent is not None and command3.root_parent.name == 'words' and not isinstance(command3, discord.app_commands.Group) or command3.name == "leaderboard" and command3.name != "reset":
                 embed.add_field(name=f'/{command3.qualified_name}', value=command3.description, inline=False)
         await ctx.response.send_message(embed=embed)
 
